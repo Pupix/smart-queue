@@ -1,5 +1,5 @@
 # smart-queue
-A generic purpose FIFO queue with ticket system, inspired by real life.
+A generic purpose *"delayed"* FIFO queue with ticket system, inspired by real life.
 
 ## The `hows` and `whys` 
 
@@ -10,7 +10,7 @@ which is not always the case, especially when asynchronous functions come into p
 The idea of a **ticket system** seems way easier to manage in many use cases. All
 you have to do is request a `ticket` and store the data using the ticket whenever it
 arrives (from other asynchronous sources), you don't have to worry about ordering
-your data before hand. The queue and tickets do it for you.
+your data beforehand. The queue and tickets do it for you.
 
 ## Download
 smart-queue is installable via:
@@ -52,12 +52,14 @@ smart-queue is installable via:
 
 ### Queue(limit, handler)
 
-Create and instance of `smart-queue`.
+Creates an instance of `smart-queue`.
 
 **Parameters**
 
 1. **[limit = Infinity] {number}** The maximum number of possible clients in the queue.
 2. **[handler] {Function}** Function that will be called when there's an error or the queue has emptied. Will be called with `(error)` as first and only argument.
+
+The `handler` can be passed directly, without having to specify the limit.
 
 ## Properties
 
@@ -83,6 +85,9 @@ Returns a `ticket` with the next available queue position and creates a placehol
 ### start()
 
 Starts the queue processing and returns the first client in the queue.
+
+The processing won't start until all the requested tickets have been filled
+with some kind of data.
 
 ### current()
 

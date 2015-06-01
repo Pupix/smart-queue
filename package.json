@@ -1,8 +1,8 @@
 {
   "name": "smart-queue",
   "license": "MIT",
-  "description": "A generic purpose FIFO queue with ticket system, inspired by real life.",
-  "version": "0.8.0",
+  "description": "A generic purpose *\"delayed\"* FIFO queue with ticket system, inspired by real life.",
+  "version": "0.8.1",
   "homepage": "https://github.com/Pupix/smart-queue",
   "author": {
     "name": "Robert Manolea",
@@ -27,6 +27,8 @@
   "keywords": [
     "queue",
     "ticket",
-    "FIFO"
+    "FIFO",
+    "delayed queue",
+    "delayed FIFO"
   ]
 }
