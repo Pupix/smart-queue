@@ -22,44 +22,71 @@ smart-queue is installable via:
 
 ```js
     var Queue = require('smart-queue'),
-        q = new Queue(),
-        ticket;
+        bouncer = function (err, status) {
+            console.log('The bouncer says: ' + (err || 'The queue has emptied'));
+        },
+        //We set a handler to be able to read errors and the queue status
+        q = new Queue({handler: bouncer}),
+        ticket,
+        timedTicket;
     
     //Assume this is the queue of a club
     
-    //A ticket is sold
+    //A permanent ticket is sold.
     ticket = q.getTicket();
     
-    //Jimmy arrives at the club
+    //A temporary ticket is sold. It must be used within a second or it expires.
+    timedTicket = q.getTicket(1000);
+    
+    //Jimmy arrives at the club.
     q.join('Jimmmy');
     
-    //Bob arrives at the club with the ticket that was sold earlier
+    //Bob arrives at the club with the ticket that was sold earlier.
     q.join(ticket, 'Bob');
     
-    //The queue processing starts
-    console.log(q.start());
-    => {"1": "Bob"}
+    //After a minute the queue process starts.
+    setTimeout(function () {
     
-    console.log(q.next());
-    => {"2": "Jimmy"}
+        console.log(q.next());
+        => {"1": "Bob"}
+        
+        //As the queue is processing Megan tries to join with her ticket.
+        q.join(timedTicket, 'Megan', function () {
+        
+            => "The bouncer says: Ticket No. 2 has expired."
+            
+            //Megan can still join the queue, but now she has to wait in line.
+            q.join('Megan');
+        });
+        
+        console.log(q.next());
+        => {"3": "Jimmy"}
+        
+        console.log(q.next());
+        => {"4": "Megan"}
+        
+        q.next();
+        => "The bouncer says: The queue has emptied"
+        
+    }, 60000);
     
     //Even if `Jimmy` arrived at the club before anyone else, whoever reserved
-    //a ticket earlier got in before him. In this case, `Bob`.
+    //a ticket earlier had the possibility to get in before him.
 
 ```
 
 ## Getting started
 
-### Queue(limit, handler)
+### Queue(opt)
 
 Creates an instance of `smart-queue`.
 
 **Parameters**
 
-1. **[limit = Infinity] {number}** The maximum number of possible clients in the queue.
-2. **[handler] {Function}** Function that will be called when there's an error or the queue has emptied. Will be called with `(error)` as first and only argument.
-
-The `handler` can be passed directly, without having to specify the limit.
+1. **opt {Object}** Configuration object
+    * **[opt.limit = Infinity] {number}** The maximum number of possible clients in the queue.
+    * **[opt.lifetime = Infinity] {number}** The amount of time (in milliseconds) tickets are valid for, after they has been issued.
+    * **[opt.handler] {Function}** Function that will be called when there's an error or the queue has emptied. Will be called with `(error, queueStatus)` as arguments.
 
 ## Properties
 
@@ -71,32 +98,41 @@ It present the queue in an `object` with the `ticket` as key and the specified d
 
 ## Methods
 
-### getTicket()
+### getTicket(lifetime)
 
-Returns a `ticket` with the next available queue position and creates a placeholder into the queue.
+Creates a placeholder into the next available queue position and returns its `ticket`.
+
+**Parameters**
+
+1. **[lifetime] {number}** The amount of time (in milliseconds) the ticket is valid for.
+2. **[cb] {Function}** An optional callback for client related errors. Will be called with `(error, queueStatus)` as arguments.
 
 ### join(ticket, data)
 
 **Parameters**
 
-1. **[ticket] {number | string | *}** The ticket number to be used for data storage.
-2. **[data] {*}** The data to be stored.
+1. **[ticket] {number | string | \*}** The ticket number to be used for data storage.
+2. **[data] {\*}** The data to be stored.
+3. **[cb] {Function}** An optional callback for client related errors. Will be called with `(error, queueStatus)` as arguments.
 
-### start()
-
-Starts the queue processing and returns the first client in the queue.
-
-The processing won't start until all the requested tickets have been filled
-with some kind of data.
-
-### current()
+### current(cb)
 
 Returns the current client in the queue.
 
-### next()
+**Parameters**
 
-Removes the current client from the queue and advances the queue.
+1. **[cb] {Function}** An optional callback for client related errors. Will be called with `(error, queueStatus)` as arguments.
+
+### next(cb)
+
+The very first time it's ran it will start the queue processing.
+Sequential call of next will remove the current client from the queue
+and advance the queue.
+
+**Parameters**
+
+1. **[cb] {Function}** An optional callback for client related errors. Will be called with `(error, queueStatus)` as arguments.
 
 ### reset()
 
-Resets all the `queue`'s data, except for the client `limit` and `handler`.
+Resets all the `queue`'s data, except for the options passed through the Queue constructor.
