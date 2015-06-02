@@ -48,7 +48,7 @@ smart-queue is installable via:
     setTimeout(function () {
     
         console.log(q.next());
-        => {"1": "Bob"}
+        => {id: 1, value: "Bob"}
         
         //As the queue is processing Megan tries to join with her ticket.
         q.join(timedTicket, 'Megan', function () {
@@ -60,10 +60,10 @@ smart-queue is installable via:
         });
         
         console.log(q.next());
-        => {"3": "Jimmy"}
+        => {id: 3, value: "Jimmy"}
         
         console.log(q.next());
-        => {"4": "Megan"}
+        => {id: 4, value: "Megan"}
         
         q.next();
         => "The bouncer says: The queue has emptied"
