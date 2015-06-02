@@ -98,7 +98,7 @@ It present the queue in an `object` with the `ticket` as key and the specified d
 
 ## Methods
 
-### getTicket(lifetime)
+### getTicket(lifetime, cb)
 
 Creates a placeholder into the next available queue position and returns its `ticket`.
 
@@ -107,7 +107,7 @@ Creates a placeholder into the next available queue position and returns its `ti
 1. **[lifetime] {number}** The amount of time (in milliseconds) the ticket is valid for.
 2. **[cb] {Function}** An optional callback for client related errors. Will be called with `(error, queueStatus)` as arguments.
 
-### join(ticket, data)
+### join(ticket, data, cb)
 
 **Parameters**
 
