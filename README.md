@@ -83,7 +83,7 @@ Creates an instance of `smart-queue`.
 
 **Parameters**
 
-1. **opt {Object}** Configuration object
+1. **[opt] {Object}** Configuration object
     * **[opt.limit = Infinity] {number}** The maximum number of possible clients in the queue.
     * **[opt.lifetime = Infinity] {number}** The amount of time (in milliseconds) tickets are valid for, after they has been issued.
     * **[opt.handler] {Function}** Function that will be called when there's an error or the queue has emptied. Will be called with `(error, queueStatus)` as arguments.
